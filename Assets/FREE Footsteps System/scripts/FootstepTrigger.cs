@@ -52,8 +52,11 @@ namespace Footsteps {
 
 		void OnTriggerEnter(Collider other) {
 			if(footsteps) {
-				footsteps.TryPlayFootstep(iAmLeft);
-			}
+                footsteps.TryPlayFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
+
+                GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, other.transform.position, 4, 6);
+               
+            }
 		}
 
 		void SetCollisions() {

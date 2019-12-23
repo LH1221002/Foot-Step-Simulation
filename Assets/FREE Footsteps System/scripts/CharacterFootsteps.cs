@@ -6,32 +6,37 @@
 
 // DISCLAIMER : THIS SCRIPT CAN BE USED IN ANY WAY, MENTIONING MY WORK WILL BE GREATLY APPRECIATED BUT NOT REQUIRED.
 
+using System.Collections;
 using UnityEngine;
 
-namespace Footsteps {
+namespace Footsteps
+{
 
-	public enum TriggeredBy {
-		COLLISION_DETECTION,	// The footstep sound will be played when the physical foot collides with the ground.
-		TRAVELED_DISTANCE		// The footstep sound will be played after the character has traveled a certain distance
-	}
+    public enum TriggeredBy
+    {
+        COLLISION_DETECTION,    // The footstep sound will be played when the physical foot collides with the ground.
+        TRAVELED_DISTANCE       // The footstep sound will be played after the character has traveled a certain distance
+    }
 
-	public enum ControllerType {
-		RIGIDBODY,
-		CHARACTER_CONTROLLER
-	}
+    public enum ControllerType
+    {
+        RIGIDBODY,
+        CHARACTER_CONTROLLER
+    }
 
-	public class CharacterFootsteps : MonoBehaviour {
+    public class CharacterFootsteps : MonoBehaviour
+    {
 
-		[Tooltip("The method of triggering footsteps.")]
-		[SerializeField] TriggeredBy triggeredBy;
+        [Tooltip("The method of triggering footsteps.")]
+        [SerializeField] TriggeredBy triggeredBy;
 
-		[Tooltip("This is used to determine what distance has to be traveled in order to play the footstep sound.")]
-		[SerializeField] float distanceBetweenSteps = 1.8f;
+        [Tooltip("This is used to determine what distance has to be traveled in order to play the footstep sound.")]
+        [SerializeField] float distanceBetweenSteps = 1.8f;
 
-		[Tooltip("To know how much the character moved, a reference to a rigidbody / character controller is needed.")]
-		[SerializeField] ControllerType controllerType;
-		[SerializeField] Rigidbody characterRigidbody;
-		[SerializeField] CharacterController characterController;
+        [Tooltip("To know how much the character moved, a reference to a rigidbody / character controller is needed.")]
+        [SerializeField] ControllerType controllerType;
+        [SerializeField] Rigidbody characterRigidbody;
+        [SerializeField] CharacterController characterController;
 
         [Tooltip("Use only one audioSource?.")]
         [SerializeField] bool oneAudioSource;
@@ -46,64 +51,91 @@ namespace Footsteps {
 
         // Random volume between this limits
         [SerializeField] float minVolume = 0.3f;
-		[SerializeField] float maxVolume = 0.5f;
+        [SerializeField] float maxVolume = 0.5f;
 
-		[Tooltip("If this is enabled, you can see how far the script will check for ground, and the radius of the check.")]
-		[SerializeField] bool debugMode = true;
+        [Tooltip("If this is enabled, you can see how far the script will check for ground, and the radius of the check.")]
+        [SerializeField] bool debugMode = true;
 
-		[Tooltip("How high, relative to the character's pivot point the start of the ray is.")]
-		[SerializeField] float groundCheckHeight = 0.5f;
+        [Tooltip("How high, relative to the character's pivot point the start of the ray is.")]
+        [SerializeField] float groundCheckHeight = 0.5f;
 
-		[Tooltip("What is the radius of the ray.")]
-		[SerializeField] float groundCheckRadius = 0.5f;
+        [Tooltip("What is the radius of the ray.")]
+        [SerializeField] float groundCheckRadius = 0.5f;
 
-		[Tooltip("How far the ray is casted.")]
-		[SerializeField] float groundCheckDistance = 0.3f;
+        [Tooltip("How far the ray is casted.")]
+        [SerializeField] float groundCheckDistance = 0.3f;
 
-		[Tooltip("What are the layers that should be taken into account when checking for ground.")]
-		[SerializeField] LayerMask groundLayers;
+        [Tooltip("What are the layers that should be taken into account when checking for ground.")]
+        [SerializeField] LayerMask groundLayers;
 
-		Transform thisTransform;
-		RaycastHit currentGroundInfo;
-		float stepCycleProgress;
-		float lastPlayTime;
-		bool previouslyGrounded;
-		bool isGrounded;
+        [SerializeField] int amountOfBombs = 5;
+        [SerializeField] bool showBombs;
+        [SerializeField] GameObject bombPrefab;
+        [SerializeField] bool useTimer;
+        [SerializeField] int seconds = 25;
 
+        Transform thisTransform;
+        RaycastHit currentGroundInfo;
+        float stepCycleProgress;
+        float lastPlayTime;
+        bool previouslyGrounded;
+        bool isGrounded;
 
-		void Start() {
-			if(groundLayers.value == 0) {
-				groundLayers = 1;
-			}
+        Vector2[] bombs;
 
-			thisTransform = transform;
-			string errorMessage = "";
+        void Start()
+        {
+            if (groundLayers.value == 0)
+            {
+                groundLayers = 1;
+            }
 
-			if(!audioSource) errorMessage = "No audio source assigned in the inspector, footsteps cannot be played";
-			else if(triggeredBy == TriggeredBy.TRAVELED_DISTANCE && !characterRigidbody && !characterController) errorMessage = "Please assign a Rigidbody or CharacterController component in the inspector, footsteps cannot be played";
-			else if(!FindObjectOfType<SurfaceManager>()) errorMessage = "Please create a Footstep Database, otherwise footsteps cannot be played, you can create a database" +
-																		" by clicking 'FootstepsCreator' in the main menu";
+            thisTransform = transform;
+            string errorMessage = "";
 
-			if(errorMessage != "") {
-				Debug.LogError(errorMessage);
-				enabled = false;
-			}
-		}
+            if (!audioSource) errorMessage = "No audio source assigned in the inspector, footsteps cannot be played";
+            else if (triggeredBy == TriggeredBy.TRAVELED_DISTANCE && !characterRigidbody && !characterController) errorMessage = "Please assign a Rigidbody or CharacterController component in the inspector, footsteps cannot be played";
+            else if (!FindObjectOfType<SurfaceManager>()) errorMessage = "Please create a Footstep Database, otherwise footsteps cannot be played, you can create a database" +
+                                                                         " by clicking 'FootstepsCreator' in the main menu";
 
-		void Update() {
-			CheckGround();
+            if (errorMessage != "")
+            {
+                Debug.LogError(errorMessage);
+                enabled = false;
+            }
 
-			if(triggeredBy == TriggeredBy.TRAVELED_DISTANCE) {
-				float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
+            bombs = new Vector2[amountOfBombs];
+            for (int i = 0; i < amountOfBombs; i++)
+            {
+                bombs[i] = (new Vector2(Random.Range(0, 15) + (float)0.5, Random.Range(2, 31) + (float)0.5));
+            }
+            if (showBombs)
+            {
+                for (int i = 0; i < bombs.Length; i++)
+                {
+                    Instantiate(bombPrefab).transform.localPosition = new Vector3(bombs[i].x, 0, bombs[i].y);
+                }
+            }
+        }
 
-				if(isGrounded) {
-					// Advance the step cycle only if the character is grounded.
-					AdvanceStepCycle(speed * Time.deltaTime);
-				}
-			}
-		}
+        void Update()
+        {
+            CheckGround();
 
-        public enum audioDirection{
+            if (triggeredBy == TriggeredBy.TRAVELED_DISTANCE)
+            {
+                float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
+
+                if (isGrounded)
+                {
+                    // Advance the step cycle only if the character is grounded.
+                    AdvanceStepCycle(speed * Time.deltaTime);
+                }
+            }
+        }
+
+        public enum audioDirection
+        {
             left,
             right,
             both
@@ -127,7 +159,8 @@ namespace Footsteps {
             }
         }
 
-		public void TryPlayFootstep(bool b) {
+        public void TryPlayFootstep(bool b, Vector2 coordinates)
+        {
             audioDirection direction;
             if (b)
             {
@@ -137,56 +170,105 @@ namespace Footsteps {
             {
                 direction = audioDirection.right;
             }
-			if(isGrounded) {
-				PlayFootstep(direction);
-			}
-		}
+            if (isGrounded)
+            {
+                PlayFootstep(direction, coordinates);
+            }
+        }
 
-		void PlayLandSound() {
+        void PlayLandSound()
+        {
             playSound(SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point), 1, audioDirection.both);
         }
 
-		void AdvanceStepCycle(float increment) {
-			stepCycleProgress += increment;
+        void AdvanceStepCycle(float increment)
+        {
+            stepCycleProgress += increment;
 
-			if(stepCycleProgress > distanceBetweenSteps) {
-				stepCycleProgress = 0f;
-				PlayFootstep(audioDirection.both);
-			}
-		}
+            if (stepCycleProgress > distanceBetweenSteps)
+            {
+                stepCycleProgress = 0f;
+                PlayFootstep(audioDirection.both, new Vector2(-1, -1));
+            }
+        }
 
-		void PlayFootstep(audioDirection direction) {
-			AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point);
-			float randomVolume = Random.Range(minVolume, maxVolume);
+        private bool called = false;
+        void PlayFootstep(audioDirection direction, Vector2 coordinates)
+        {
+            AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point);
+            float volume;
+            minVolume = (float)0.8;
+            maxVolume = 60;
+            if (coordinates.x == -1)
+                volume = Random.Range(minVolume, maxVolume);
+            else
+            {
+                float distance = 10;
+                for (int i = 0; i < bombs.Length; i++)
+                {
+                    distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+                }
+                volume = minVolume;
+                if (distance < 5) volume = 4;
+                if (distance < 4) volume = 10;
+                if (distance < 3) volume = 18;
+                if (distance < 2) volume = 32;
+                if (distance < 1)
+                {
+                    volume = maxVolume;
+                    this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
+                    if (called == false)
+                    {
+                        called = true;
+                        StartCoroutine(ExampleCoroutine());
+                    }
+                }
+                //print(distance + " : " + volume);
+            }
 
-			if(randomFootstep) {
-                playSound(randomFootstep, randomVolume, direction);
-			}
-		}
+            if (randomFootstep)
+            {
+                playSound(randomFootstep, volume, direction);
+            }
+        }
+        IEnumerator ExampleCoroutine()
+        {
+            print("Piep Piep Piep...");
+            yield return new WaitForSeconds((float)0.5);
 
-		void OnDrawGizmos() {
-			if(debugMode) {
-				Gizmos.DrawWireSphere(transform.position + Vector3.up * groundCheckHeight, groundCheckRadius);
-				Gizmos.color = Color.red;
-				Gizmos.DrawRay(transform.position + Vector3.up * groundCheckHeight, Vector3.down * (groundCheckDistance + groundCheckRadius));
-			}
-		}
+            GameObject.FindGameObjectWithTag("TopDownController").GetComponent<Rigidbody>().AddExplosionForce(100000, GameObject.FindGameObjectWithTag("TopDownController").transform.position, 5, 4);
+            called = false;
+        }
 
-		void CheckGround() {
-			previouslyGrounded = isGrounded;
-			Ray ray = new Ray(thisTransform.position + Vector3.up * groundCheckHeight, Vector3.down);
+        void OnDrawGizmos()
+        {
+            if (debugMode)
+            {
+                Gizmos.DrawWireSphere(transform.position + Vector3.up * groundCheckHeight, groundCheckRadius);
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(transform.position + Vector3.up * groundCheckHeight, Vector3.down * (groundCheckDistance + groundCheckRadius));
+            }
+        }
 
-			if(Physics.SphereCast(ray, groundCheckRadius, out currentGroundInfo, groundCheckDistance, groundLayers, QueryTriggerInteraction.Ignore)) {
-				isGrounded = true;
-			}
-			else {
-				isGrounded = false;
-			}
+        void CheckGround()
+        {
+            previouslyGrounded = isGrounded;
+            Ray ray = new Ray(thisTransform.position + Vector3.up * groundCheckHeight, Vector3.down);
 
-			if(!previouslyGrounded && isGrounded) {
-				PlayLandSound();
-			}
-			// print(isGrounded);
-		}
-	}
+            if (Physics.SphereCast(ray, groundCheckRadius, out currentGroundInfo, groundCheckDistance, groundLayers, QueryTriggerInteraction.Ignore))
+            {
+                isGrounded = true;
+            }
+            else
+            {
+                isGrounded = false;
+            }
+
+            if (!previouslyGrounded && isGrounded)
+            {
+                PlayLandSound();
+            }
+            // print(isGrounded);
+        }
+    }
 }

@@ -28,7 +28,6 @@ public class KeyboardInputs : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            print("hi");
         }
     }
 }

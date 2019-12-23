@@ -6,6 +6,9 @@ TagManager:
   tags:
   - FootStepTriggerL
   - FootStepTriggerR
+  - BombIndicator
+  - TestCube
+  - TopDownController
   layers:
   - Default
   - TransparentFX

@@ -75,9 +75,14 @@ namespace Footsteps {
 			SerializedProperty groundCheckHeight = serializedObject.FindProperty("groundCheckHeight");
 			SerializedProperty groundCheckRadius = serializedObject.FindProperty("groundCheckRadius");
 			SerializedProperty groundCheckDistance = serializedObject.FindProperty("groundCheckDistance");
-			SerializedProperty groundLayers = serializedObject.FindProperty("groundLayers");
+			SerializedProperty groundLayers = serializedObject.FindProperty("groundLayers");           
+            SerializedProperty amountOfBombs = serializedObject.FindProperty("amountOfBombs");
+            SerializedProperty showBombs = serializedObject.FindProperty("showBombs");
+            SerializedProperty bombPrefab = serializedObject.FindProperty("bombPrefab");
+            SerializedProperty useTimer = serializedObject.FindProperty("useTimer");
+            SerializedProperty seconds = serializedObject.FindProperty("seconds");
 
-			EditorGUILayout.LabelField("General Settings", new GUIStyle() { fontStyle = FontStyle.BoldAndItalic });
+            EditorGUILayout.LabelField("General Settings", new GUIStyle() { fontStyle = FontStyle.BoldAndItalic });
 			rect = EditorGUILayout.GetControlRect();
 
             // Audio Sources
@@ -121,7 +126,29 @@ namespace Footsteps {
 			rect.y = rect.yMax + 2;
 			EditorGUI.PropertyField(rect, groundLayers);
 
-			for(int i = 0;i < 20;i ++) EditorGUILayout.Space();
+            // amountOfBombs
+            rect.y = rect.yMax + 2;
+            EditorGUI.PropertyField(rect, amountOfBombs);
+
+            // showBombs
+            rect.y = rect.yMax + 2;
+            EditorGUI.PropertyField(rect, showBombs);
+            
+            // Bomb Prefab
+            rect.y = rect.yMax + 2;
+            EditorGUI.PropertyField(rect, bombPrefab);
+
+            // useTimer
+            rect.y = rect.yMax + 2;
+            EditorGUI.PropertyField(rect, useTimer);
+
+            // seconds
+            rect.y = rect.yMax + 2;
+            EditorGUI.PropertyField(rect, seconds);
+
+            
+
+            for (int i = 0;i < 28;i ++) EditorGUILayout.Space();
 
 			serializedObject.ApplyModifiedProperties();
 		}
