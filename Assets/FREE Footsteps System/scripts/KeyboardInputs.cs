@@ -29,5 +29,10 @@ public class KeyboardInputs : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            GameObject.FindGameObjectWithTag("TopDownController").GetComponent<Rigidbody>().AddForce(Vector2.up * 30000);
+        }
     }
 }
