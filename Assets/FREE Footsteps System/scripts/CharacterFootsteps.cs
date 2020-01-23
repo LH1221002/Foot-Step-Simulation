@@ -74,6 +74,9 @@ namespace Footsteps
         [SerializeField] bool useTimer;
         [SerializeField] int seconds = 25;
 
+        private int width = 8;
+        private int height = 16;
+
         Transform thisTransform;
         RaycastHit currentGroundInfo;
         float stepCycleProgress;
@@ -107,7 +110,7 @@ namespace Footsteps
             bombs = new Vector2[amountOfBombs];
             for (int i = 0; i < amountOfBombs; i++)
             {
-                bombs[i] = (new Vector2(Random.Range(0, 15) + (float)0.5, Random.Range(2, 31) + (float)0.5));
+                bombs[i] = (new Vector2(Random.Range(0, width) + (float)0.5, Random.Range(2, height) + (float)0.5));
             }
             if (showBombs)
             {
