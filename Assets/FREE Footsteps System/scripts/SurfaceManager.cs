@@ -81,7 +81,7 @@ public class SurfaceManager : MonoBehaviour {
 	}
 
 	// This is for footsteps
-	int GetSurfaceIndex(Collider col, Vector3 worldPos) {
+	public int GetSurfaceIndex(Collider col, Vector3 worldPos) {
 		string textureName = "";
 
 		// Case when the ground is a terrain.

@@ -162,20 +162,21 @@ namespace Footsteps
             }
         }
 
-        public void TryPlayFootstep(bool b, Vector2 coordinates)
+        public void TrySetFootstep(bool b, Vector2 coordinates)
         {
-            audioDirection direction;
-            if (b)
-            {
-                direction = audioDirection.left;
-            }
-            else
-            {
-                direction = audioDirection.right;
-            }
+            audioDirection direction = b ? audioDirection.left : audioDirection.right;
             if (isGrounded)
             {
-                PlayFootstep(direction, coordinates);
+                SetFootstep(direction, coordinates);
+            }
+        }
+
+        public void TryPlayFootstep(bool b, Vector2 coordinates, float pressure)
+        {
+            audioDirection direction = b ? audioDirection.left : audioDirection.right;
+            if (isGrounded)
+            {
+                PlayFootstep(direction, coordinates, pressure);
             }
         }
 
@@ -191,12 +192,81 @@ namespace Footsteps
             if (stepCycleProgress > distanceBetweenSteps)
             {
                 stepCycleProgress = 0f;
-                PlayFootstep(audioDirection.both, new Vector2(-1, -1));
+                SetFootstep(audioDirection.both, new Vector2(-1, -1));
             }
         }
 
         private bool called = false;
-        void PlayFootstep(audioDirection direction, Vector2 coordinates)
+        private int oldGroundId = -1;
+        private int oldDistance = -1;
+        void SetFootstep(audioDirection direction, Vector2 coordinates)
+        {
+            /////////////
+            int groundId = SurfaceManager.singleton.GetSurfaceIndex(currentGroundInfo.collider, currentGroundInfo.point);
+            int newDistance = 0;
+
+            int strength = 200; //0-200
+            int layers = 2;     //2-16
+            int amplitude = 0;  //0-127
+            /////////////
+            
+            float distance = getDistanceToBombs(coordinates);
+
+            if (distance < 1)
+            {
+                newDistance = 0;
+                strength = 0;
+                layers = 16;
+                amplitude = 127;
+            }
+            else if (distance < 2)
+            {
+                newDistance = 1;
+                strength = 10;
+                layers = 12;
+                amplitude = 127;
+            }
+            else if (distance < 3)
+            {
+                newDistance = 2;
+                strength = 30;
+                layers = 8;
+                amplitude = 115;
+            }
+            else if (distance < 4)
+            {
+                newDistance = 3;
+                strength = 50;
+                layers = 8;
+                amplitude = 100;
+            }
+            else if (distance < 5)
+            {
+                newDistance = 4;
+                strength = 70;
+                layers = 8;
+                amplitude = 85;
+            }
+            else
+            {
+                newDistance = -1;
+                strength = 200;
+                layers = 2;
+                amplitude = 0;
+            }
+
+            if (newDistance != oldDistance || oldGroundId != groundId)
+            {
+                oldDistance = newDistance;
+                groundId = oldGroundId;
+                //print($"Strength {strength} Layers {layers} Amplitude {amplitude}");
+                //////////////////
+                //sendToShoe(strength, layers, amplitude);
+                //////////////////
+            }
+        }
+
+        void PlayFootstep(audioDirection direction, Vector2 coordinates, float pressure)
         {
             AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point);
             float volume;
@@ -206,25 +276,33 @@ namespace Footsteps
                 volume = Random.Range(minVolume, maxVolume);
             else
             {
-                float distance = 10;
-                for (int i = 0; i < bombs.Length; i++)
-                {
-                    distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
-                }
-                volume = minVolume;
-                if (distance < 5) volume = 4;
-                if (distance < 4) volume = 10;
-                if (distance < 3) volume = 18;
-                if (distance < 2) volume = 32;
+                float distance = getDistanceToBombs(coordinates);
+
                 if (distance < 1)
                 {
                     volume = maxVolume;
-                    this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
-                    if (called == false)
-                    {
-                        called = true;
-                        StartCoroutine(ExampleCoroutine());
-                    }
+                    explode();
+                }
+                else if (distance < 2)
+                {
+                    volume = 32;
+                    if (pressure > 0.8) explode();
+                }
+                else if (distance < 3)
+                {
+                    volume = 18;
+                }
+                else if (distance < 4)
+                {
+                    volume = 10;
+                }
+                else if (distance < 5)
+                {
+                    volume = 4;
+                }
+                else
+                {
+                    volume = 0;
                 }
                 //print(distance + " : " + volume);
             }
@@ -234,6 +312,27 @@ namespace Footsteps
                 playSound(randomFootstep, volume, direction);
             }
         }
+
+        private void explode()
+        {
+            this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
+            if (called == false)
+            {
+                called = true;
+                StartCoroutine(ExampleCoroutine());
+            }
+        }
+
+        private float getDistanceToBombs(Vector2 coordinates)
+        {
+            float distance = 10;
+            for (int i = 0; i < bombs.Length; i++)
+            {
+                distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+            }
+            return distance;
+        }
+
         IEnumerator ExampleCoroutine()
         {
             print("Piep Piep Piep...");

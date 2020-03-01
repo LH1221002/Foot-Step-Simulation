@@ -8,10 +8,11 @@ namespace Footsteps {
 
 		Collider thisCollider;
 		CharacterFootsteps footsteps;
+		public bool useShoeDeviceDate = false;
 
         private bool iAmLeft;
 
-		void Start() {
+		void Awake() {
             if (this.gameObject.tag == "FootStepTriggerL")
             {
                 iAmLeft = true;
@@ -47,16 +48,50 @@ namespace Footsteps {
 		}
 
 		void OnEnable() {
-			SetCollisions();
+			if (useShoeDeviceDate)
+			{
+				thisCollider.enabled = false;
+			}
+			else
+			{
+				thisCollider.enabled = true;
+				SetCollisions();
+			}
 		}
 
-		void OnTriggerEnter(Collider other) {
-			if(footsteps) {
-                footsteps.TryPlayFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
+		private void Update()
+		{
+			if (useShoeDeviceDate)
+			{
+				if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit))
+				{
+					//offsetDistance = hit.distance;
+					//Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
+					updatePosition(hit.collider);
+				}
+			}
+		}
 
-                GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, other.transform.position, 4, 6);
-               
+		private void updatePosition(Collider other) {
+			if(footsteps) {
+                footsteps.TrySetFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
             }
+		}
+
+		public void handlePressure(float pressure)
+		{
+			if (useShoeDeviceDate)
+			{
+				if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit))
+				{
+					if (footsteps)
+					{
+						footsteps.TryPlayFootstep(iAmLeft, hit.collider.transform.localPosition, pressure);
+
+						GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, hit.collider.transform.position, 4, 6);
+					}
+				}
+			}
 		}
 
 		void SetCollisions() {
