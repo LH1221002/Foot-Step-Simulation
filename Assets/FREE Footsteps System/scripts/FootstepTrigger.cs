@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using HapticShoes;
 
 namespace Footsteps {
 
@@ -10,9 +11,33 @@ namespace Footsteps {
 		CharacterFootsteps footsteps;
 		public bool useShoeDeviceDate = false;
 
+        private ShoeController sc;
+
         private bool iAmLeft;
 
-		void Awake() {
+
+        void Awake() {
+
+            if (useShoeDeviceDate)
+            {
+                this.GetComponent<Collider>().enabled = false;
+            }
+            else
+            {
+                this.GetComponent<Collider>().enabled = !(true==false);
+                SetCollisions();
+            }
+
+        }
+		IEnumerator Start() {
+
+            yield return new WaitForSeconds(2);
+            sc = GetComponent<ShoeController>();
+
+            sc.ReceiveData((int raw, int scaled) => {
+                handlePressure(scaled / 255f);
+            });
+
             if (this.gameObject.tag == "FootStepTriggerL")
             {
                 iAmLeft = true;
@@ -41,23 +66,12 @@ namespace Footsteps {
 
 			if(errorMessage != "") {
 				Debug.LogError(errorMessage);
-				enabled = false;
+				//enabled = false;
 
-				return;
+				yield break;
 			}
 		}
 
-		void OnEnable() {
-			if (useShoeDeviceDate)
-			{
-				thisCollider.enabled = false;
-			}
-			else
-			{
-				thisCollider.enabled = true;
-				SetCollisions();
-			}
-		}
 
 		private void Update()
 		{
@@ -67,15 +81,25 @@ namespace Footsteps {
 				{
 					//offsetDistance = hit.distance;
 					//Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
-					updatePosition(hit.collider);
-				}
+					VibrationData vd = updatePosition(hit.collider);
+                    if (vd == null) return;
+                    if(sc) sc.SendToShoe(vd.Strength, vd.Material, vd.Volume, vd.Layers);
+                }
+                else
+                {
+                    if (sc) sc.SendToShoe(255);
+
+
+                }
+
 			}
 		}
 
-		private void updatePosition(Collider other) {
+		private VibrationData updatePosition(Collider other) {
 			if(footsteps) {
-                footsteps.TrySetFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
+                return footsteps.TrySetFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
             }
+            return null;
 		}
 
 		public void handlePressure(float pressure)

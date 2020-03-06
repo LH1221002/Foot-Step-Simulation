@@ -6,6 +6,7 @@
 
 // DISCLAIMER : THIS SCRIPT CAN BE USED IN ANY WAY, MENTIONING MY WORK WILL BE GREATLY APPRECIATED BUT NOT REQUIRED.
 
+using HapticShoes;
 using System.Collections;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Footsteps
         CHARACTER_CONTROLLER
     }
 
-    public class CharacterFootsteps : MonoBehaviour
+    public partial class CharacterFootsteps : MonoBehaviour
     {
 
         [Tooltip("The method of triggering footsteps.")]
@@ -88,6 +89,7 @@ namespace Footsteps
 
         void Start()
         {
+            return;
             if (groundLayers.value == 0)
             {
                 groundLayers = 1;
@@ -162,13 +164,14 @@ namespace Footsteps
             }
         }
 
-        public void TrySetFootstep(bool b, Vector2 coordinates)
+        public VibrationData TrySetFootstep(bool b, Vector2 coordinates)
         {
             audioDirection direction = b ? audioDirection.left : audioDirection.right;
             if (isGrounded)
             {
-                SetFootstep(direction, coordinates);
+                return SetFootstep(direction, coordinates);
             }
+            return null;
         }
 
         public void TryPlayFootstep(bool b, Vector2 coordinates, float pressure)
@@ -199,7 +202,7 @@ namespace Footsteps
         private bool called = false;
         private int oldGroundId = -1;
         private int oldDistance = -1;
-        void SetFootstep(audioDirection direction, Vector2 coordinates)
+        VibrationData SetFootstep(audioDirection direction, Vector2 coordinates)
         {
             /////////////
             int groundId = SurfaceManager.singleton.GetSurfaceIndex(currentGroundInfo.collider, currentGroundInfo.point);
@@ -216,42 +219,42 @@ namespace Footsteps
             {
                 newDistance = 0;
                 strength = 0;
-                layers = 16;
+                layers = 15;
                 amplitude = 127;
             }
             else if (distance < 2)
             {
                 newDistance = 1;
-                strength = 10;
-                layers = 12;
+                strength = 100;
+                layers = 15;
                 amplitude = 127;
             }
             else if (distance < 3)
             {
                 newDistance = 2;
-                strength = 30;
-                layers = 8;
-                amplitude = 115;
+                strength = 120;
+                layers = 15;
+                amplitude = 110;
             }
             else if (distance < 4)
             {
                 newDistance = 3;
-                strength = 50;
-                layers = 8;
-                amplitude = 100;
+                strength = 140;
+                layers = 15;
+                amplitude = 75;
             }
             else if (distance < 5)
             {
                 newDistance = 4;
-                strength = 70;
-                layers = 8;
-                amplitude = 85;
+                strength = 160;
+                layers = 15;
+                amplitude = 50;
             }
             else
             {
                 newDistance = -1;
                 strength = 200;
-                layers = 2;
+                layers = 15;
                 amplitude = 0;
             }
 
@@ -264,6 +267,8 @@ namespace Footsteps
                 //sendToShoe(strength, layers, amplitude);
                 //////////////////
             }
+
+            return new VibrationData { Strength = strength, Layers = layers, Volume = amplitude, Material = ShoeController.Material.Wood };
         }
 
         void PlayFootstep(audioDirection direction, Vector2 coordinates, float pressure)
@@ -315,7 +320,7 @@ namespace Footsteps
 
         private void explode()
         {
-            this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
+            //this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
             if (called == false)
             {
                 called = true;
