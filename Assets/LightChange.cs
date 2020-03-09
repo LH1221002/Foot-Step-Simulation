@@ -7,9 +7,9 @@ public class LightChange : MonoBehaviour
 {
     public Light light;
     public GameObject shoe;
-    public GameObject s;
+    public GameObject LookAtTarget;
     public GameObject cont;
-
+    public bool IsRightShoe = false;
     private ShoeController rightShoe;
     
     // Start is called before the first frame update
@@ -17,7 +17,6 @@ public class LightChange : MonoBehaviour
     {
         
      
-        s.transform.localRotation= Quaternion.Euler(s.transform.localRotation.eulerAngles.x, cont.transform.localRotation.y, s.transform.localRotation.eulerAngles.z);
         yield return new WaitForSeconds(2);
         Debug.Log("Los gehts");
         rightShoe = GetComponent<ShoeController>();
@@ -29,6 +28,7 @@ public class LightChange : MonoBehaviour
         light.color = Color.green;
         yield return new WaitForSeconds(5);
         RaycastHit hit;
+        
         var forward = transform.TransformDirection(Vector3.up) * 10;
         if (Physics.Raycast(transform.position, forward, out hit, Mathf.Infinity))
         {
@@ -40,6 +40,13 @@ public class LightChange : MonoBehaviour
             var e = Quaternion.LookRotation(-hit.transform.up).eulerAngles;
             shoe.transform.rotation = Quaternion.FromToRotation(-Vector3.up, hit.normal);
             Debug.DrawRay(hit.transform.gameObject.transform.position, hit.normal * 10, Color.green, 25);
+
+            Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
+
+
+            cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x,cont.transform.position.y, LookAtTarget.transform.position.z));
+            cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + 90, 0);
+          
         }
         else
         {
