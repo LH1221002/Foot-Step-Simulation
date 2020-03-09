@@ -13,15 +13,15 @@ public class CheckTrigger : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        Debug.Log("TriggerEnter A");
+        //Debug.Log("TriggerEnter A");
         if (other != null && other.tag == "Material")
         {
-            Debug.Log("Getting Value ");
+            //Debug.Log("Getting Value ");
             var ob = other.gameObject;
             GroundProperties props = ob.GetComponent<GroundProperties>();
             if (controller != null)
             {
-                Debug.Log("New Propeties " + props.volume + " " + props.strength);
+                //Debug.Log("New Propeties " + props.volume + " " + props.strength);
                 controller.SendToShoe(props.strength, props.material, props.volume, props.layer);
             }
         }
@@ -29,7 +29,7 @@ public class CheckTrigger : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        Debug.Log("TriggerExit A");
+        //Debug.Log("TriggerExit A");
         if (other != null && other.tag == "Material")
         {
             if (controller != null)

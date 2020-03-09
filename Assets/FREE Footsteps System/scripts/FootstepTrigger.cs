@@ -15,7 +15,7 @@ namespace Footsteps
 
         private ShoeController sc;
 
-        private bool iAmLeft;
+        public bool iAmLeft;
 
 
         //void Awake() {
@@ -49,14 +49,14 @@ namespace Footsteps
                 StartCoroutine(OnStart());
             }
 
-            if (this.gameObject.tag == "FootStepTriggerL")
-            {
-                iAmLeft = true;
-            }
-            else
-            {
-                iAmLeft = false;
-            }
+            //if (this.gameObject.tag == "FootStepTriggerL")
+            //{
+            //    iAmLeft = true;
+            //}
+            //else
+            //{
+            //    iAmLeft = false;
+            //}
 
             thisCollider = GetComponent<Collider>();
             footsteps = GetComponentInParent<CharacterFootsteps>();
@@ -90,7 +90,7 @@ namespace Footsteps
         {
             if (useShoeDeviceDate)
             {
-                if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit))
+                if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
                 {
                     //offsetDistance = hit.distance;
                     //Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
@@ -119,7 +119,7 @@ namespace Footsteps
 
         private void OnTriggerEnter(Collider other)
         {
-            print("enter");
+            //print("enter");
             if (useShoeDeviceDate) return;
 
             handlePressure(0.6f);
@@ -128,9 +128,8 @@ namespace Footsteps
         private StandingButton currentStandingButton;
         public void handlePressure(float pressure)
         {
-            if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit))
+            if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider")))) // ignore collisions with layerX))
             {
-                print(hit.collider.transform.position);
                 if (footsteps)
                 {
                     footsteps.TryPlayFootstep(iAmLeft, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), pressure);
@@ -144,7 +143,7 @@ namespace Footsteps
                 }
                 else if (currentStandingButton != null)
                 {
-                    sb.Exit(this.iAmLeft);
+                    currentStandingButton.Exit(this.iAmLeft);
                 }
             }
         }

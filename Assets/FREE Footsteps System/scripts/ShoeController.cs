@@ -143,7 +143,7 @@ namespace HapticShoes
                 //print("2");
                 if (!alreadyReceivingData)
 				{
-                    print("3");
+                    //print("3");
                     alreadyReceivingData = true;
 					shoeInstance.SendMessage("6,5,0\n");
                     shoeInstance.ServerResponse += ProcessData;

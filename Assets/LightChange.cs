@@ -33,7 +33,7 @@ public class LightChange : MonoBehaviour
         if (Physics.Raycast(transform.position, forward, out hit, Mathf.Infinity))
         {
             Debug.DrawRay(transform.position, forward, Color.yellow, 25);
-            Debug.Log("Did Hit");
+            //Debug.Log("Did Hit");
 
 
             var forwarsd = -hit.transform.gameObject.transform.up * 10;
@@ -41,7 +41,7 @@ public class LightChange : MonoBehaviour
             shoe.transform.rotation = Quaternion.FromToRotation(-Vector3.up, hit.normal);
             Debug.DrawRay(hit.transform.gameObject.transform.position, hit.normal * 10, Color.green, 25);
 
-            Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
+            //Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
 
 
             cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x,cont.transform.position.y, LookAtTarget.transform.position.z));
@@ -51,7 +51,7 @@ public class LightChange : MonoBehaviour
         else
         {
             Debug.DrawRay(transform.position, forward, Color.white, 25);
-            Debug.Log("Did not Hit");
+            //Debug.Log("Did not Hit");
         }
 
         rightShoe.CalibrateMax();

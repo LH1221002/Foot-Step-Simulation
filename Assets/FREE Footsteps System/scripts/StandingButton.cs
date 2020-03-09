@@ -10,6 +10,7 @@ public class StandingButton : MonoBehaviour
     public float timeForButtonPress;
     private bool leftFootOnMe;
     private bool rightFootOnMe;
+    private bool running;
 
     public void Enter(bool left)
     {
@@ -21,7 +22,7 @@ public class StandingButton : MonoBehaviour
         {
             rightFootOnMe = true;
         }
-        if(leftFootOnMe && rightFootOnMe)
+        if(leftFootOnMe && rightFootOnMe && !running)
         {
             StartCoroutine(ButtonPress());
         }
@@ -40,6 +41,8 @@ public class StandingButton : MonoBehaviour
     }
     private IEnumerator ButtonPress()
     {
+        running = true;
+        Debug.LogWarning("Starting");
         int i = 0;
         while (leftFootOnMe && rightFootOnMe)
         {
@@ -47,10 +50,14 @@ public class StandingButton : MonoBehaviour
             i++;
             if (i >= 8)
             {
+                Debug.LogWarning("Ending");
                 MethodsToCallAfterStanding[currentI].Invoke();
                 currentI++;
+                running = false;
                 yield break;
             }
         }
+        running = false;
+        yield break;
     }
 }

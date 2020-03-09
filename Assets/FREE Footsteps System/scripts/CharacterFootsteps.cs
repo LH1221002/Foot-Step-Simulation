@@ -91,7 +91,7 @@ namespace Footsteps
         GameObject[] goalIndicators;
         private int currenti;
 
-        void Start()
+        void Awake()
         {
             diamondScore = GameObject.FindGameObjectWithTag("DiamondScore").GetComponent<DiamondScore>();
             if (groundLayers.value == 0)
@@ -312,7 +312,7 @@ namespace Footsteps
 
         void PlayFootstep(audioDirection direction, Vector2 coordinates, float pressure)
         {
-            print("playing footstep");
+            //print("playing footstep");
             AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point);
             float volume;
             minVolume = (float)0.8;
@@ -322,7 +322,7 @@ namespace Footsteps
             else
             {
                 float distance = getDistanceToBombs(coordinates);
-                print(distance);
+                //print(distance);
                 if (distance < 1)
                 {
                     volume = maxVolume;
@@ -357,6 +357,7 @@ namespace Footsteps
                 playSound(randomFootstep, volume, direction);
             }
 
+            if (currenti >= goals.Length) return;
             if (Vector2.Distance(coordinates, goals[currenti]) <0.6f)
             {
                 //Show progress or smth

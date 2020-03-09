@@ -7,26 +7,26 @@ using UnityEngine.Events;
 public class DiamondScore : MonoBehaviour
 {
     public TMP_Text text;
-    public int currentScore
-    {
-        get { return currentScore; }
-        set
-        {
-            currentScore = value;
-            text?.SetText($"{currentScore}/{maxScore}");
-        }
-    }
+    private int currentScore;
     public UnityEvent[] MethodsToCallAfterAllCollected;
     private int currentI;
-    public int maxScore { get { return maxScore; } set
-        {
-            maxScore = value;
-            text?.SetText($"{currentScore}/{maxScore}");
-        } }
+    private int maxScore = 3;
 
+    public void SetCurrentScore(int value)
+    {
+        currentScore = value;
+        text?.SetText($"{currentScore}/{maxScore}");
+    }
+
+    public void SetMaxScore(int value)
+    {
+        maxScore = value;
+        text?.SetText($"{currentScore}/{maxScore}");
+    }
     public bool IncrementScore()
     {
         currentScore++;
+        print(currentScore);
         text?.SetText($"{currentScore}/{maxScore}");
         if (currentScore >= maxScore)
         {
