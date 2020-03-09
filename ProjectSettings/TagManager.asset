@@ -11,6 +11,7 @@ TagManager:
   - TopDownController
   - Material
   - Goal
+  - DiamondScore
   layers:
   - Default
   - TransparentFX

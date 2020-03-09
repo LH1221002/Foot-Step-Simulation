@@ -125,6 +125,7 @@ namespace Footsteps
             handlePressure(0.6f);
         }
 
+        private StandingButton currentStandingButton;
         public void handlePressure(float pressure)
         {
             if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit))
@@ -134,7 +135,16 @@ namespace Footsteps
                 {
                     footsteps.TryPlayFootstep(iAmLeft, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), pressure);
 
-                    GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), 4, 6);
+                    //GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), 4, 6);
+                }
+                if(hit.collider.gameObject.TryGetComponent<StandingButton>(out StandingButton sb))
+                {
+                    currentStandingButton = sb;
+                    sb.Enter(this.iAmLeft);
+                }
+                else if (currentStandingButton != null)
+                {
+                    sb.Exit(this.iAmLeft);
                 }
             }
         }

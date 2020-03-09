@@ -84,6 +84,7 @@ namespace Footsteps
         float lastPlayTime;
         bool previouslyGrounded;
         bool isGrounded;
+        private DiamondScore diamondScore;
 
         Vector2[] bombs;
         Vector2[] goals;
@@ -92,6 +93,7 @@ namespace Footsteps
 
         void Start()
         {
+            diamondScore = GameObject.FindGameObjectWithTag("DiamondScore").GetComponent<DiamondScore>();
             if (groundLayers.value == 0)
             {
                 groundLayers = 1;
@@ -109,22 +111,33 @@ namespace Footsteps
             {
                 Debug.LogError(errorMessage);
                 enabled = false;
-            }
+            }   
+        }
 
+        public void StartGame()
+        {
+            ActivateGoals();
+            ActivateBombs();
+        }
+
+        public void ActivateGoals()
+        {
             goalIndicators = GameObject.FindGameObjectsWithTag("Goal");
             goals = new Vector2[goalIndicators.Length];
-            print(this.gameObject.name + "goals:" +goalIndicators.Length);
-            for (int i=0; i<goalIndicators.Length; i++)
+            for (int i = 0; i < goalIndicators.Length; i++)
             {
                 goals[i] = new Vector2(goalIndicators[i].transform.localPosition.x, goalIndicators[i].transform.localPosition.z);
                 goalIndicators[i].SetActive(i == currenti);
             }
-            
+        }
+
+        public void ActivateBombs()
+        {
             if (amountOfBombs < 0)
             {
                 GameObject[] bombIndicators = GameObject.FindGameObjectsWithTag("BombIndicator");
                 bombs = new Vector2[bombIndicators.Length];
-                for (int i = 0; i< bombIndicators.Length; i++)
+                for (int i = 0; i < bombIndicators.Length; i++)
                 {
                     bombs[i] = new Vector2(bombIndicators[i].transform.localPosition.x, bombIndicators[i].transform.localPosition.z);
                     print(i + ": " + bombs[i]);
@@ -346,6 +359,13 @@ namespace Footsteps
             if (Vector2.Distance(coordinates, goals[currenti]) <0.6f)
             {
                 //Show progress or smth
+                if (currenti >= goalIndicators.Length) return;
+                if (diamondScore.IncrementScore())
+                {
+                    currenti = 0;
+                    goalIndicators.Initialize();    //clear the list
+                    goals.Initialize();
+                }
                 goalIndicators[currenti].SetActive(false);
                 currenti++;
                 if (currenti == goalIndicators.Length)
