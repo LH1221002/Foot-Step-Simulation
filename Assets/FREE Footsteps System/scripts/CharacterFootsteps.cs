@@ -111,13 +111,14 @@ namespace Footsteps
             {
                 Debug.LogError(errorMessage);
                 enabled = false;
-            }   
+            }
+            ActivateGoals();
         }
 
-        public void StartGame()
+        public void StartGame(bool b)
         {
             ActivateGoals();
-            ActivateBombs();
+            ActivateBombs(b);
         }
 
         public void ActivateGoals()
@@ -131,7 +132,7 @@ namespace Footsteps
             }
         }
 
-        public void ActivateBombs()
+        public void ActivateBombs(bool b)
         {
             if (amountOfBombs < 0)
             {
@@ -141,7 +142,7 @@ namespace Footsteps
                 {
                     bombs[i] = new Vector2(bombIndicators[i].transform.localPosition.x, bombIndicators[i].transform.localPosition.z);
                     print(i + ": " + bombs[i]);
-                    bombIndicators[i].SetActive(showBombs);
+                    bombIndicators[i].SetActive(showBombs || b);
                 }
             }
             else
@@ -393,9 +394,12 @@ namespace Footsteps
         private float getDistanceToBombs(Vector2 coordinates)
         {
             float distance = 10;
-            for (int i = 0; i < bombs.Length; i++)
+            if (bombs!=null)
             {
-                distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+                for (int i = 0; i < bombs.Length; i++)
+                {
+                    distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+                }
             }
             return distance;
         }
