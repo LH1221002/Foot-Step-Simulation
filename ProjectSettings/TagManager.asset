@@ -9,6 +9,8 @@ TagManager:
   - BombIndicator
   - TestCube
   - TopDownController
+  - Material
+  - Goal
   layers:
   - Default
   - TransparentFX
@@ -19,7 +21,7 @@ TagManager:
   - 
   - 
   - Invisible
-  - 
+  - Post Processing
   - 
   - 
   - 

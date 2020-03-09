@@ -69,13 +69,13 @@ namespace Footsteps
         [Tooltip("What are the layers that should be taken into account when checking for ground.")]
         [SerializeField] LayerMask groundLayers;
 
-        [SerializeField] int amountOfBombs = 5;
+        [SerializeField] int amountOfBombs = 5; //set -1 if you want to use placed bombs
         [SerializeField] bool showBombs;
         [SerializeField] GameObject bombPrefab;
         [SerializeField] bool useTimer;
         [SerializeField] int seconds = 25;
 
-        private int width = 8;
+        private int width = 10;
         private int height = 16;
 
         Transform thisTransform;
@@ -86,10 +86,12 @@ namespace Footsteps
         bool isGrounded;
 
         Vector2[] bombs;
+        Vector2[] goals;
+        GameObject[] goalIndicators;
+        private int currenti;
 
         void Start()
         {
-            return;
             if (groundLayers.value == 0)
             {
                 groundLayers = 1;
@@ -109,16 +111,39 @@ namespace Footsteps
                 enabled = false;
             }
 
-            bombs = new Vector2[amountOfBombs];
-            for (int i = 0; i < amountOfBombs; i++)
+            goalIndicators = GameObject.FindGameObjectsWithTag("Goal");
+            goals = new Vector2[goalIndicators.Length];
+            print(this.gameObject.name + "goals:" +goalIndicators.Length);
+            for (int i=0; i<goalIndicators.Length; i++)
             {
-                bombs[i] = (new Vector2(Random.Range(0, width) + (float)0.5, Random.Range(2, height) + (float)0.5));
+                goals[i] = new Vector2(goalIndicators[i].transform.localPosition.x, goalIndicators[i].transform.localPosition.z);
+                goalIndicators[i].SetActive(i == currenti);
             }
-            if (showBombs)
+            
+            if (amountOfBombs < 0)
             {
-                for (int i = 0; i < bombs.Length; i++)
+                GameObject[] bombIndicators = GameObject.FindGameObjectsWithTag("BombIndicator");
+                bombs = new Vector2[bombIndicators.Length];
+                for (int i = 0; i< bombIndicators.Length; i++)
                 {
-                    Instantiate(bombPrefab).transform.localPosition = new Vector3(bombs[i].x, 0, bombs[i].y);
+                    bombs[i] = new Vector2(bombIndicators[i].transform.localPosition.x, bombIndicators[i].transform.localPosition.z);
+                    print(i + ": " + bombs[i]);
+                    bombIndicators[i].SetActive(showBombs);
+                }
+            }
+            else
+            {
+                bombs = new Vector2[amountOfBombs];
+                for (int i = 0; i < amountOfBombs; i++)
+                {
+                    bombs[i] = (new Vector2(Random.Range(0, width) + (float)0.5, Random.Range(2, height) + (float)0.5));
+                }
+                if (showBombs)
+                {
+                    for (int i = 0; i < bombs.Length; i++)
+                    {
+                        Instantiate(bombPrefab).transform.localPosition = new Vector3(bombs[i].x, 0, bombs[i].y);
+                    }
                 }
             }
         }
@@ -273,6 +298,7 @@ namespace Footsteps
 
         void PlayFootstep(audioDirection direction, Vector2 coordinates, float pressure)
         {
+            print("playing footstep");
             AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point);
             float volume;
             minVolume = (float)0.8;
@@ -282,7 +308,7 @@ namespace Footsteps
             else
             {
                 float distance = getDistanceToBombs(coordinates);
-
+                print(distance);
                 if (distance < 1)
                 {
                     volume = maxVolume;
@@ -315,6 +341,22 @@ namespace Footsteps
             if (randomFootstep)
             {
                 playSound(randomFootstep, volume, direction);
+            }
+
+            if (Vector2.Distance(coordinates, goals[currenti]) <0.6f)
+            {
+                //Show progress or smth
+                goalIndicators[currenti].SetActive(false);
+                currenti++;
+                if (currenti == goalIndicators.Length)
+                {
+                    //End
+                    print("Everything done");
+                }
+                else
+                {
+                    goalIndicators[currenti].SetActive(true);
+                }
             }
         }
 
