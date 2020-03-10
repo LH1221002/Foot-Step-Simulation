@@ -15,7 +15,7 @@ public class StandingButton : MonoBehaviour
 
     public void Enter(bool left)
     {
-        print("Button Enter");
+        //print("Button Enter");
         if (leftFootOnMe && rightFootOnMe) return;
         if (left)
         {
@@ -45,7 +45,6 @@ public class StandingButton : MonoBehaviour
     private IEnumerator ButtonPress()
     {
         running = true;
-        Debug.LogWarning("Starting");
         int i = 0;
         while (leftFootOnMe && rightFootOnMe)
         {
@@ -53,7 +52,6 @@ public class StandingButton : MonoBehaviour
             i++;
             if (i >= 8)
             {
-                Debug.LogWarning("Ending");
                 //MethodsToCallAfterStanding[currentI].Invoke();
                 platformTransitioner.afterUp = MethodsToCallAfterStanding[currentI];
                 platformTransitioner.DoDownAnimation();

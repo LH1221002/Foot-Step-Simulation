@@ -117,12 +117,15 @@ namespace Footsteps
 
         public void StartGame(bool b)
         {
+            if (!this.gameObject.activeSelf) return;
             ActivateGoals();
             ActivateBombs(b);
         }
 
         public void ActivateGoals()
         {
+            if (!this.gameObject.activeSelf) return;
+            currenti = 0;
             goalIndicators = GameObject.FindGameObjectsWithTag("Goal");
             goals = new Vector2[goalIndicators.Length];
             for (int i = 0; i < goalIndicators.Length; i++)
@@ -134,6 +137,7 @@ namespace Footsteps
 
         public void ActivateBombs(bool b)
         {
+            if (!this.gameObject.activeSelf) return;
             if (amountOfBombs < 0)
             {
                 GameObject[] bombIndicators = GameObject.FindGameObjectsWithTag("BombIndicator");
@@ -141,7 +145,6 @@ namespace Footsteps
                 for (int i = 0; i < bombIndicators.Length; i++)
                 {
                     bombs[i] = new Vector2(bombIndicators[i].transform.localPosition.x, bombIndicators[i].transform.localPosition.z);
-                    print(i + ": " + bombs[i]);
                     bombIndicators[i].SetActive(showBombs || b);
                 }
             }
