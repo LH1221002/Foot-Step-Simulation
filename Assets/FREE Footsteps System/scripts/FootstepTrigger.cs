@@ -119,7 +119,6 @@ namespace Footsteps
 
         private void OnTriggerEnter(Collider other)
         {
-            //print("enter");
             if (useShoeDeviceDate) return;
 
             handlePressure(0.6f);
@@ -132,10 +131,11 @@ namespace Footsteps
             {
                 if (footsteps)
                 {
-                    footsteps.TryPlayFootstep(iAmLeft, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), pressure);
+                    footsteps.TryPlayFootstep(iAmLeft, new Vector2(hit.collider.transform.localPosition.x, hit.collider.transform.localPosition.y), pressure);
 
                     //GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), 4, 6);
                 }
+                //print(hit.collider.name + ": "+hit.collider.transform.localPosition);
                 if(hit.collider.gameObject.TryGetComponent<StandingButton>(out StandingButton sb))
                 {
                     currentStandingButton = sb;

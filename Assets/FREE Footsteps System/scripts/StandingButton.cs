@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public class StandingButton : MonoBehaviour
 {
     public UnityEvent[] MethodsToCallAfterStanding;
+    public PlatformTransitioner platformTransitioner;
     private int currentI;
     public float timeForButtonPress;
     private bool leftFootOnMe;
@@ -14,6 +15,7 @@ public class StandingButton : MonoBehaviour
 
     public void Enter(bool left)
     {
+        print("Button Enter");
         if (left)
         {
             leftFootOnMe = true;
@@ -51,7 +53,9 @@ public class StandingButton : MonoBehaviour
             if (i >= 8)
             {
                 Debug.LogWarning("Ending");
-                MethodsToCallAfterStanding[currentI].Invoke();
+                //MethodsToCallAfterStanding[currentI].Invoke();
+                platformTransitioner.afterUp = MethodsToCallAfterStanding[currentI];
+                platformTransitioner.DoDownAnimation();
                 currentI++;
                 running = false;
                 yield break;

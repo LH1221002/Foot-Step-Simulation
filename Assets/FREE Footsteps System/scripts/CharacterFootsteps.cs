@@ -347,7 +347,7 @@ namespace Footsteps
                 }
                 else
                 {
-                    volume = 0;
+                    volume = 0.2f;
                 }
                 //print(distance + " : " + volume);
             }
@@ -358,6 +358,7 @@ namespace Footsteps
             }
 
             if (currenti >= goals.Length) return;
+            //print(coordinates +" : "+ goals[currenti]);
             if (Vector2.Distance(coordinates, goals[currenti]) <0.6f)
             {
                 //Show progress or smth
