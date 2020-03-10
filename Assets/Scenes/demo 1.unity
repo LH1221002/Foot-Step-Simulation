@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18120867, g: 0.22680458, b: 0.30733752, a: 1}
+  m_IndirectSpecularColor: {r: 0.1812083, g: 0.22680393, b: 0.30733654, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -106708,7 +106708,7 @@ PrefabInstance:
     - target: {fileID: 1711219102088055577, guid: 9b465fb928931bf4c9490e2a0fdb023f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1711219102088055577, guid: 9b465fb928931bf4c9490e2a0fdb023f,
         type: 3}
@@ -110618,7 +110618,7 @@ GameObject:
   - component: {fileID: 7297346173373183104}
   - component: {fileID: 7297346173373183120}
   m_Layer: 0
-  m_Name: Cube (2)
+  m_Name: Green - StrongVibration
   m_TagString: Material
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110667,8 +110667,8 @@ Transform:
   m_LocalPosition: {x: 1.55, y: -1.72, z: -5.3815727}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 7297346175455688224}
   - {fileID: 7297346175035205867}
+  - {fileID: 7297346175455688224}
   - {fileID: 7297346173373183118}
   - {fileID: 7297346174743845657}
   m_Father: {fileID: 0}
@@ -110688,7 +110688,7 @@ GameObject:
   - component: {fileID: 7297346174743845659}
   - component: {fileID: 7297346174743845639}
   m_Layer: 0
-  m_Name: Cube (3)
+  m_Name: Snow
   m_TagString: Material
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110798,7 +110798,7 @@ GameObject:
   - component: {fileID: 7297346175035205869}
   - component: {fileID: 7297346175035205865}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Red - WeakVibration
   m_TagString: Material
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110832,7 +110832,7 @@ Transform:
   m_LocalScale: {x: 0.99657035, y: 1.6217948, z: 1.0025007}
   m_Children: []
   m_Father: {fileID: 7297346174507445157}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &7297346175035205868
 MeshRenderer:
@@ -110906,7 +110906,7 @@ Transform:
   m_LocalScale: {x: 0.95042086, y: 1.6217948, z: 0.95587385}
   m_Children: []
   m_Father: {fileID: 7297346174507445157}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7297346175455688225
 GameObject:
@@ -110922,7 +110922,7 @@ GameObject:
   - component: {fileID: 7297346175455688227}
   - component: {fileID: 7297346175455688228}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Yellow - MediumVibration
   m_TagString: Material
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
