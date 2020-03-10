@@ -16,6 +16,7 @@ public class StandingButton : MonoBehaviour
     public void Enter(bool left)
     {
         print("Button Enter");
+        if (leftFootOnMe && rightFootOnMe) return;
         if (left)
         {
             leftFootOnMe = true;

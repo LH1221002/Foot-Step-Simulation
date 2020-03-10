@@ -18,7 +18,7 @@ public class LightChange : MonoBehaviour
         
      
         yield return new WaitForSeconds(2);
-        Debug.Log("Los gehts");
+        //Debug.Log("Los gehts");
         rightShoe = GetComponent<ShoeController>();
         light.color = Color.red;
         yield return new WaitForSeconds(1);

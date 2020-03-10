@@ -62,7 +62,7 @@ namespace Footsteps
             footsteps = GetComponentInParent<CharacterFootsteps>();
             Rigidbody thisRigidbody = GetComponent<Rigidbody>();
 
-            if (thisCollider)
+            if (thisCollider && !useShoeDeviceDate)
             {
                 thisCollider.isTrigger = true;
                 SetCollisions();

@@ -264,37 +264,37 @@ namespace Footsteps
             else if (distance < 2)
             {
                 newDistance = 1;
-                strength = 100;
+                strength = 50;
                 layers = 15;
                 amplitude = 127;
             }
             else if (distance < 3)
             {
                 newDistance = 2;
-                strength = 120;
+                strength = 130;
                 layers = 15;
-                amplitude = 110;
+                amplitude = 30;
             }
-            else if (distance < 4)
-            {
-                newDistance = 3;
-                strength = 140;
-                layers = 15;
-                amplitude = 75;
-            }
-            else if (distance < 5)
-            {
-                newDistance = 4;
-                strength = 160;
-                layers = 15;
-                amplitude = 50;
-            }
+            //else if (distance < 4)
+            //{
+            //    newDistance = 3;
+            //    strength = 140;
+            //    layers = 15;
+            //    amplitude = 75;
+            //}
+            //else if (distance < 5)
+            //{
+            //    newDistance = 4;
+            //    strength = 160;
+            //    layers = 15;
+            //    amplitude = 50;
+            //}
             else
             {
                 newDistance = -1;
                 strength = 200;
-                layers = 15;
-                amplitude = 0;
+                layers = 10;
+                amplitude = 1;
             }
 
             if (newDistance != oldDistance || oldGroundId != groundId)
