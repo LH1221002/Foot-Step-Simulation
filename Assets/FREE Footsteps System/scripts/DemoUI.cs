@@ -5,9 +5,9 @@ namespace Footsteps {
 
 	public class DemoUI : MonoBehaviour {
 
-		[SerializeField] GameObject topDownController;
-		[SerializeField] GameObject topDownCamera;
-		[SerializeField] GameObject firstPersonController;
+		[SerializeField] readonly GameObject topDownController;
+		[SerializeField] readonly GameObject topDownCamera;
+		[SerializeField] readonly GameObject firstPersonController;
 
 
 		public void ActivateTopDown() {

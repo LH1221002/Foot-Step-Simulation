@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class LightChange : MonoBehaviour
 {
-    public Light light;
+    public Light indicatorLight;
     public GameObject shoe;
     public GameObject LookAtTarget;
     public GameObject cont;
@@ -20,12 +20,12 @@ public class LightChange : MonoBehaviour
         yield return new WaitForSeconds(2);
         //Debug.Log("Los gehts");
         rightShoe = GetComponent<ShoeController>();
-        light.color = Color.red;
+        indicatorLight.color = Color.red;
         yield return new WaitForSeconds(1);
         rightShoe.CalibrateMin();
 
         yield return new WaitForSeconds(2);
-        light.color = Color.green;
+        indicatorLight.color = Color.green;
         yield return new WaitForSeconds(5);
         RaycastHit hit;
         
@@ -57,7 +57,7 @@ public class LightChange : MonoBehaviour
         rightShoe.CalibrateMax();
 
         yield return new WaitForSeconds(3);
-        light.color = Color.blue;
+        indicatorLight.color = Color.blue;
         
 
         rightShoe.ReceiveData(ChangeLight);
@@ -65,7 +65,7 @@ public class LightChange : MonoBehaviour
     
     
     private void ChangeLight(int roh, int cal) {
-        light.intensity = cal;
+        indicatorLight.intensity = cal;
         //print(cal);
     }
 }
