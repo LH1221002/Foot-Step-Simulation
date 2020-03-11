@@ -63,7 +63,8 @@ namespace HapticShoes
 				try
 				{
 					string serverResponse = streamReader.ReadLine();
-                    //Debug.Log("Server Response" + ServerResponse);
+                    
+					if(serverResponse != "")
 					ServerResponse(serverResponse, new EventArgs());
 				}
 				catch

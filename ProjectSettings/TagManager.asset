@@ -12,6 +12,7 @@ TagManager:
   - Material
   - Goal
   - DiamondScore
+  - Shoe
   layers:
   - Default
   - TransparentFX

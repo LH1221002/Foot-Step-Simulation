@@ -87,6 +87,7 @@ namespace Footsteps
         private DiamondScore diamondScore;
 
         Vector2[] bombs;
+        GameObject[] bombIndicators;
         Vector2[] goals;
         GameObject[] goalIndicators;
         private int currenti;
@@ -140,7 +141,7 @@ namespace Footsteps
             if (!this.gameObject.activeSelf) return;
             if (amountOfBombs < 0)
             {
-                GameObject[] bombIndicators = GameObject.FindGameObjectsWithTag("BombIndicator");
+                bombIndicators = GameObject.FindGameObjectsWithTag("BombIndicator");
                 bombs = new Vector2[bombIndicators.Length];
                 for (int i = 0; i < bombIndicators.Length; i++)
                 {
@@ -163,6 +164,13 @@ namespace Footsteps
                     }
                 }
             }
+        }
+
+        public void ClearBombs()
+        {
+            if (!this.gameObject.activeSelf) return;
+            bombIndicators = new GameObject[0];
+            bombs = new Vector2[0];
         }
 
         void Update()
@@ -255,7 +263,7 @@ namespace Footsteps
             int amplitude = 0;  //0-127
             /////////////
             
-            float distance = getDistanceToBombs(coordinates);
+            float distance = getDistanceToBombs(coordinates).Left;
 
             if (distance < 1)
             {
@@ -267,24 +275,24 @@ namespace Footsteps
             else if (distance < 2)
             {
                 newDistance = 1;
-                strength = 50;
+                strength = 20;
                 layers = 15;
                 amplitude = 127;
             }
             else if (distance < 3)
             {
                 newDistance = 2;
-                strength = 130;
+                strength = 58;
                 layers = 15;
-                amplitude = 30;
+                amplitude = 45;
             }
-            //else if (distance < 4)
-            //{
-            //    newDistance = 3;
-            //    strength = 140;
-            //    layers = 15;
-            //    amplitude = 75;
-            //}
+            else if (distance < 4)
+            {
+                newDistance = 3;
+                strength = 80;
+                layers = 15;
+                amplitude = 20;
+            }
             //else if (distance < 5)
             //{
             //    newDistance = 4;
@@ -295,9 +303,9 @@ namespace Footsteps
             else
             {
                 newDistance = -1;
-                strength = 200;
-                layers = 10;
-                amplitude = 1;
+                strength = 90;
+                layers = 16;
+                amplitude = 2;
             }
 
             if (newDistance != oldDistance || oldGroundId != groundId)
@@ -324,17 +332,18 @@ namespace Footsteps
                 volume = Random.Range(minVolume, maxVolume);
             else
             {
-                float distance = getDistanceToBombs(coordinates);
+                Pair<float, GameObject> nearestBomb = getDistanceToBombs(coordinates);
+                float distance = nearestBomb.Left;
                 //print(distance);
                 if (distance < 1)
                 {
                     volume = maxVolume;
-                    explode();
+                    explode(nearestBomb.Right);
                 }
                 else if (distance < 2)
                 {
                     volume = 32;
-                    if (pressure > 0.8) explode();
+                    if (pressure > 0.8) explode(nearestBomb.Right);
                 }
                 else if (distance < 3)
                 {
@@ -386,27 +395,42 @@ namespace Footsteps
             }
         }
 
-        private void explode()
+        private void explode(GameObject bomb)
         {
             //this.GetComponent<Rigidbody>().AddExplosionForce(10, this.transform.position, 5, 3);
-            if (called == false)
+            bomb.SetActive(true);
+            foreach (GameObject go in GameObject.FindGameObjectsWithTag("Shoe"))
             {
-                called = true;
-                StartCoroutine(ExampleCoroutine());
+                if(go.TryGetComponent<ControllerVibration>(out ControllerVibration cv))
+                {
+                    cv.HardPulse();
+                }
             }
+            // DO SOMETHING
+            //if (called == false)
+            //{
+            //    called = true;
+            //    StartCoroutine(ExampleCoroutine());
+            //}
         }
 
-        private float getDistanceToBombs(Vector2 coordinates)
+        private Pair<float,GameObject> getDistanceToBombs(Vector2 coordinates)
         {
             float distance = 10;
+            int currentMaxI = -1;
             if (bombs!=null)
             {
                 for (int i = 0; i < bombs.Length; i++)
                 {
-                    distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+                    //distance = Mathf.Min(Vector2.Distance(coordinates, bombs[i]), distance);
+                    float currentDistance = Vector2.Distance(coordinates, bombs[i]);
+                    if (currentDistance <= distance){
+                        distance = currentDistance;
+                        currentMaxI = i;
+                    }
                 }
             }
-            return distance;
+            return new Pair<float, GameObject>() { Left = distance, Right = currentMaxI >= 0 ? bombIndicators[currentMaxI] : null};
         }
 
         IEnumerator ExampleCoroutine()

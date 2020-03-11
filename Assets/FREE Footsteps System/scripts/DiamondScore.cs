@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class DiamondScore : MonoBehaviour
 {
     public TMP_Text[] text;
+    public GameObject[] triangles;
     private int currentScore;
     public UnityEvent[] MethodsToCallAfterAllCollected;
     private int currentI;
@@ -15,6 +16,10 @@ public class DiamondScore : MonoBehaviour
     private void OnEnable()
     {
         UpdateTexts(Color.white);
+        foreach(GameObject tri in triangles)
+        {
+            tri.SetActive(false);
+        }
     }
     public void SetCurrentScore(int value)
     {
@@ -26,6 +31,10 @@ public class DiamondScore : MonoBehaviour
     {
         maxScore = value;
         UpdateTexts(Color.white);
+        foreach (GameObject tri in triangles)
+        {
+            tri.SetActive(false);
+        }
     }
 
     private void UpdateTexts(Color color)
@@ -45,6 +54,10 @@ public class DiamondScore : MonoBehaviour
         if (currentScore >= maxScore)
         {
             UpdateTexts(Color.cyan);
+            foreach (GameObject tri in triangles)
+            {
+                tri.SetActive(true);
+            }
             Next();
             return true;
         }

@@ -5,32 +5,30 @@ using UnityEngine;
 
 public class LightChange : MonoBehaviour
 {
-    public Light indicatorLight;
+    public Light lightIndicator;
     public GameObject shoe;
     public GameObject LookAtTarget;
     public GameObject cont;
-    public bool IsRightShoe = false;
-    private ShoeController rightShoe;
-    
+
+
+    private ShoeController shoeController;
+
+    private int currentPressure = 0;
+
     // Start is called before the first frame update
     public IEnumerator Start()
     {
-        
-     
         yield return new WaitForSeconds(2);
         //Debug.Log("Los gehts");
-        rightShoe = GetComponent<ShoeController>();
-        indicatorLight.color = Color.red;
-        yield return new WaitForSeconds(1);
-        rightShoe.CalibrateMin();
+        shoeController = GetComponent<ShoeController>();
 
         yield return new WaitForSeconds(2);
-        indicatorLight.color = Color.green;
-        yield return new WaitForSeconds(5);
+        lightIndicator.color = Color.green;
+        yield return new WaitForSeconds(3);
         RaycastHit hit;
-        
+
         var forward = transform.TransformDirection(Vector3.up) * 10;
-        if (Physics.Raycast(transform.position, forward, out hit, Mathf.Infinity))
+        if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y+1, transform.position.z), forward, out hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
         {
             Debug.DrawRay(transform.position, forward, Color.yellow, 25);
             //Debug.Log("Did Hit");
@@ -44,9 +42,9 @@ public class LightChange : MonoBehaviour
             //Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
 
 
-            cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x,cont.transform.position.y, LookAtTarget.transform.position.z));
+            cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x, cont.transform.position.y, LookAtTarget.transform.position.z));
             cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + 90, 0);
-          
+
         }
         else
         {
@@ -54,18 +52,20 @@ public class LightChange : MonoBehaviour
             //Debug.Log("Did not Hit");
         }
 
-        rightShoe.CalibrateMax();
+        shoeController.CalibrateMax();
 
         yield return new WaitForSeconds(3);
-        indicatorLight.color = Color.blue;
-        
+        lightIndicator.color = Color.blue;
 
-        rightShoe.ReceiveData(ChangeLight);
+
+        shoeController.ReceiveData(ChangeLight);
     }
-    
-    
-    private void ChangeLight(int roh, int cal) {
-        indicatorLight.intensity = cal;
+
+
+    private void ChangeLight(int roh, int cal)
+    {
+        lightIndicator.intensity = cal;
+        currentPressure = roh;
         //print(cal);
     }
 }

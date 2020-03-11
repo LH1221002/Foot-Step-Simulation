@@ -21,7 +21,7 @@ public class CheckTrigger : MonoBehaviour
             GroundProperties props = ob.GetComponent<GroundProperties>();
             if (controller != null)
             {
-                //Debug.Log("New Propeties " + props.volume + " " + props.strength);
+                Debug.Log("New Propeties " + props.volume + " " + props.strength);
                 controller.SendToShoe(props.strength, props.material, props.volume, props.layer);
             }
         }
@@ -35,6 +35,8 @@ public class CheckTrigger : MonoBehaviour
             if (controller != null)
                 controller.SendToShoe(255, ShoeController.Material.Wood, 0);
         }
+       
+        
     }
 
 }
