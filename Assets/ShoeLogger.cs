@@ -23,7 +23,8 @@ public class ShoeLogger : MonoBehaviour
 
     void Awake()
     {
-        outFile = File.Create(LogName + DateTime.Now.ToString() + ".gz");
+        outFile = File.Create("D:\\LuisH\\HapticFeedbackProject\\Foot-Step-Simulation\\" + LogName + ".gz ");
+        print(outFile);
         compress = new GZipStream(outFile, CompressionMode.Compress);
         writer = new StreamWriter(compress);
 
@@ -49,6 +50,7 @@ public class ShoeLogger : MonoBehaviour
     private void FinishLogfile()
     {
         writer?.Close();
+        outFile.Close();
     }
 
     [Serializable]
@@ -61,7 +63,7 @@ public class ShoeLogger : MonoBehaviour
         public int Pressure;
     }
 
-    void FixedUpdate()
+    void Fixed()
     {
         LogPart logl = new LogPart()
         {
@@ -75,12 +77,14 @@ public class ShoeLogger : MonoBehaviour
         {
             isLeft = false,
             Position = RightShoe.transform.position,
-            Rotation = LeftShoe.transform.rotation,
-            Pressure = LeftShoePressure
+            Rotation = RightShoe.transform.rotation,
+            Pressure = RightShoePressure
         };
 
         writer?.WriteLine(JsonUtility.ToJson(logl));
+        writer?.Flush();
         writer?.WriteLine(JsonUtility.ToJson(logr));
+        writer?.Flush();
 
     }
 

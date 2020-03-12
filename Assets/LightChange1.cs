@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightChange : MonoBehaviour
+public class LightChange1 : MonoBehaviour
 {
     public Light lightIndicator;
     public GameObject shoe;
@@ -18,19 +18,17 @@ public class LightChange : MonoBehaviour
     // Start is called before the first frame update
     public IEnumerator Start()
     {
-        
         yield return new WaitForSeconds(2);
         //Debug.Log("Los gehts");
         shoeController = GetComponent<ShoeController>();
 
         yield return new WaitForSeconds(2);
         lightIndicator.color = Color.green;
-        
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         RaycastHit hit;
 
-        var forward = Vector3.up * 50;
-        if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y+10, transform.position.z), forward, out hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
+        var forward = transform.TransformDirection(Vector3.up) * 10;
+        if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y+1, transform.position.z), forward, out hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
         {
             Debug.DrawRay(transform.position, forward, Color.yellow, 25);
             //Debug.Log("Did Hit");
@@ -56,7 +54,7 @@ public class LightChange : MonoBehaviour
 
         shoeController.CalibrateMax();
 
-        //yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(3);
         lightIndicator.color = Color.blue;
 
 

@@ -173,21 +173,21 @@ namespace Footsteps
             bombs = new Vector2[0];
         }
 
-        void Update()
-        {
-            CheckGround();
+        //void Update()
+        //{
+        //    CheckGround();
 
-            if (triggeredBy == TriggeredBy.TRAVELED_DISTANCE)
-            {
-                float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
+        //    if (triggeredBy == TriggeredBy.TRAVELED_DISTANCE)
+        //    {
+        //        float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
 
-                if (isGrounded)
-                {
-                    // Advance the step cycle only if the character is grounded.
-                    AdvanceStepCycle(speed * Time.deltaTime);
-                }
-            }
-        }
+        //        if (isGrounded)
+        //        {
+        //            // Advance the step cycle only if the character is grounded.
+        //            AdvanceStepCycle(speed * Time.deltaTime);
+        //        }
+        //    }
+        //}
 
         public enum audioDirection
         {
@@ -214,8 +214,10 @@ namespace Footsteps
             }
         }
 
-        public VibrationData TrySetFootstep(bool b, Vector2 coordinates)
+        public VibrationData TrySetFootstep(bool b, Vector2 coordinates, RaycastHit col)
         {
+            currentGroundInfo = col;
+            isGrounded = true;
             audioDirection direction = b ? audioDirection.left : audioDirection.right;
             if (isGrounded)
             {
@@ -256,13 +258,16 @@ namespace Footsteps
         {
             /////////////
             int groundId = SurfaceManager.singleton.GetSurfaceIndex(currentGroundInfo.collider, currentGroundInfo.point);
+
             int newDistance = 0;
 
             int strength = 200; //0-200
             int layers = 2;     //2-16
             int amplitude = 0;  //0-127
-            /////////////
-            
+                                /////////////
+
+            //print("ghuer: "+ groundId + " : " + currentGroundInfo.transform.GetComponent<MeshRenderer>().material.name) ;
+
             float distance = getDistanceToBombs(coordinates).Left;
 
             if (distance < 1)
@@ -279,7 +284,7 @@ namespace Footsteps
                 layers = 15;
                 amplitude = 127;
             }
-            else if (distance < 3)
+            else if (distance < 3 || bombs==null)
             {
                 newDistance = 2;
                 strength = 58;
@@ -318,7 +323,7 @@ namespace Footsteps
                 //////////////////
             }
 
-            return new VibrationData { Strength = strength, Layers = layers, Volume = amplitude, Material = ShoeController.Material.Wood };
+            return new VibrationData { Strength = strength, Layers = layers, Volume = amplitude, Material = groundId == 5 ? ShoeController.Material.Snow : ShoeController.Material.Wood };
         }
 
         void PlayFootstep(audioDirection direction, Vector2 coordinates, float pressure)
@@ -343,7 +348,7 @@ namespace Footsteps
                 else if (distance < 2)
                 {
                     volume = 32;
-                    if (pressure > 0.8) explode(nearestBomb.Right);
+                    //if (pressure > 0.8) explode(nearestBomb.Right);
                 }
                 else if (distance < 3)
                 {

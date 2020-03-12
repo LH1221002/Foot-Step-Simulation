@@ -38,7 +38,7 @@ namespace Footsteps
 
             sc.ReceiveData((int raw, int scaled) =>
             {
-                handlePressure(scaled / 255f);
+                handlePressure(scaled);
             });
         }
         public void Start()
@@ -85,7 +85,7 @@ namespace Footsteps
             }
         }
 
-
+        private bool aboveBomb;
         private void Update()
         {
             if (useShoeDeviceDate)
@@ -94,25 +94,29 @@ namespace Footsteps
                 {
                     //offsetDistance = hit.distance;
                     //Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
-                    VibrationData vd = updatePosition(hit.collider);
+                    VibrationData vd = updatePosition(hit);
                     if (vd == null) return;
                     if (sc) sc.SendToShoe(vd.Strength, vd.Material, vd.Volume, vd.Layers);
+                    aboveBomb = vd.Strength == 0;
                 }
                 else
                 {
                     if (sc) sc.SendToShoe(255);
-
-
+                    aboveBomb = false;
                 }
 
             }
+            else
+            {
+                aboveBomb = false;
+            }
         }
 
-        private VibrationData updatePosition(Collider other)
+        private VibrationData updatePosition(RaycastHit other)
         {
             if (footsteps)
             {
-                return footsteps.TrySetFootstep(iAmLeft, other.transform.localPosition);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
+                return footsteps.TrySetFootstep(iAmLeft, other.transform.localPosition, other);// new Vector2(other.transform.localPosition.x, other.transform.localPosition.y));
             }
             return null;
         }
@@ -127,10 +131,12 @@ namespace Footsteps
         private StandingButton currentStandingButton;
         public void handlePressure(float pressure)
         {
+            //print("Pressure: " + pressure);
             if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider")))) // ignore collisions with layerX))
             {
                 if (footsteps)
                 {
+                    if (sc && aboveBomb) sc.SendExplodeToShoe();
                     footsteps.TryPlayFootstep(iAmLeft, new Vector2(hit.collider.transform.localPosition.x, hit.collider.transform.localPosition.y), pressure);
 
                     //GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), 4, 6);

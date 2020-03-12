@@ -62,6 +62,11 @@ namespace HapticShoes
 
         public void SendToShoe(int strength, Material material = Material.Wood, int volume = 127, int layers = 15)
         {
+            if (ToggleMapAndSetup.UseStaticVibration)
+            {
+                SendStaticToShoe(volume);
+                return;
+            }
             int clamppedStrength = Mathf.Clamp(strength, 0, 255);
             int clamppedVolume = Mathf.Clamp(volume, 0, 127);
             int clamppedLayers = Mathf.Clamp(layers, 2, 16);
@@ -106,7 +111,7 @@ namespace HapticShoes
 
                 if (shoeInstance != null && shoeInstance.IsConnected)
                 {
-                    Debug.Log("Sending: "+command.ToString());
+                    //Debug.Log("Sending: "+command.ToString());
                     shoeInstance.SendMessage(command.ToString());
                 }
             }
@@ -115,7 +120,6 @@ namespace HapticShoes
         public void SendStaticToShoe(int volume)
         {
             //Meh
-            return;
             int clamppedVolume = Mathf.Clamp(volume, 0, 127);
 
             bool dataChanged = false;
@@ -139,6 +143,27 @@ namespace HapticShoes
                     shoeInstance.SendMessage(command.ToString());
                 }
             }
+        }
+
+        public void SendVibrationToShoe(int volum = 127)
+        {
+            int clamppedVolume = Mathf.Clamp(volum, 0, 127);
+
+            if (shoeInstance != null && shoeInstance.IsConnected)
+            {
+                shoeInstance.SendMessage("8,"+ clamppedVolume .ToString()+ ",0\n");
+            }
+
+        }
+
+        public void SendExplodeToShoe()
+        {
+                
+                if (shoeInstance != null && shoeInstance.IsConnected)
+                {
+                    shoeInstance.SendMessage("7,0\n");
+                }
+            
         }
 
         public void CalibrateMax()
@@ -178,7 +203,7 @@ namespace HapticShoes
                 {
                     //print("3");
                     alreadyReceivingData = true;
-                    shoeInstance.SendMessage("4,20,0\n");
+                    ToggleDataTransfer();
                     shoeInstance.ServerResponse += ProcessData;
                     shoeInstance.StartListening();
                 }

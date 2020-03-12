@@ -44,6 +44,7 @@ namespace HapticShoes
 
 		public void SendMessage(string message)
 		{
+			Debug.Log(message);
 			streamWriter.WriteLine(message);
 			streamWriter.Flush();
 		}

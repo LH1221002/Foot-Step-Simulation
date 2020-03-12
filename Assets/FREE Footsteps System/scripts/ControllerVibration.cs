@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using HapticShoes;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
@@ -14,6 +15,7 @@ public class ControllerVibration : MonoBehaviour
     
     void OnCollisionStay(Collision collisionInfo)
     {
+        GetComponent<ShoeController>().SendVibrationToShoe(100);
         Pulse(duration, frequency, amplitude, source);
     }
 

@@ -13,6 +13,10 @@ TagManager:
   - Goal
   - DiamondScore
   - Shoe
+  - Map1
+  - Map2
+  - NonInteractive
+  - Interactive
   layers:
   - Default
   - TransparentFX
