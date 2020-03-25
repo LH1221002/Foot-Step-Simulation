@@ -1,7 +1,12 @@
 ﻿using HapticShoes;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>
+/// Example class on how to use the ShoeController
+/// 
+/// It shows a light on the shoe corresponding to the values of the pressure sensor
+/// </summary>
 
 public class LightChange : MonoBehaviour
 {
@@ -15,34 +20,39 @@ public class LightChange : MonoBehaviour
 
     private int currentPressure = 0;
 
-    // Start is called before the first frame update
-    public IEnumerator Start()
+    public IEnumerator Start()                             //needs to be an IEnumerator to be able to call WaitForSeconds (The ShoeController does need a few seconds to connect, before that, CalibrateMax() returns false)
     {
-        
         yield return new WaitForSeconds(2);
-        //Debug.Log("Los gehts");
         shoeController = GetComponent<ShoeController>();
 
         yield return new WaitForSeconds(2);
-        lightIndicator.color = Color.green;
+        lightIndicator.color = Color.green;                 //Indicator for the user to stand for calibration
         
         yield return new WaitForSeconds(2);
-        RaycastHit hit;
 
+        RotateShoe();                                       //Rotates the 3D Shoe object in unity, so the controllers or trackers do not need to be at the exact same position every time (which would be practically impossible)
+
+        while (!shoeController.CalibrateMax())
+        {
+            yield return new WaitForSeconds(1);
+        }
+
+        lightIndicator.color = Color.blue;                  //Indicator that the calibration is done
+
+        shoeController.ReceiveData(ChangeLight);            //Submits a method to be called with the pressure data in an update function
+    }
+
+    private void RotateShoe()
+    {
         var forward = Vector3.up * 50;
-        if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y+10, transform.position.z), forward, out hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
+        if (Physics.Raycast(new Vector3(transform.position.x, transform.position.y + 10, transform.position.z), forward, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
         {
             Debug.DrawRay(transform.position, forward, Color.yellow, 25);
-            //Debug.Log("Did Hit");
-
 
             var forwarsd = -hit.transform.gameObject.transform.up * 10;
             var e = Quaternion.LookRotation(-hit.transform.up).eulerAngles;
             shoe.transform.rotation = Quaternion.FromToRotation(-Vector3.up, hit.normal);
             Debug.DrawRay(hit.transform.gameObject.transform.position, hit.normal * 10, Color.green, 25);
-
-            //Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
-
 
             cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x, cont.transform.position.y, LookAtTarget.transform.position.z));
             cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + 90, 0);
@@ -51,16 +61,7 @@ public class LightChange : MonoBehaviour
         else
         {
             Debug.DrawRay(transform.position, forward, Color.white, 25);
-            //Debug.Log("Did not Hit");
         }
-
-        shoeController.CalibrateMax();
-
-        //yield return new WaitForSeconds(3);
-        lightIndicator.color = Color.blue;
-
-
-        shoeController.ReceiveData(ChangeLight);
     }
 
 

@@ -4,31 +4,33 @@ using UnityEngine;
 
 namespace HapticShoes
 {
+    /// <summary>
+    /// ShoeController
+    /// 
+    /// This is the class on which methods are to be called when wanting to communicate with the shoe device
+    /// </summary>
+    
     public class ShoeController : MonoBehaviour
     {
         [Tooltip("IP Adress of the Shoe")]
-        public string IPAddress = "192.168.0.106";
+        public string IPAddress = "192.168.0.106";                  // The shoe needs to be connected to the local hotspot of the computer
 
         private Action<int, int> callback;
         private ServerHandler shoeInstance;
 
         private bool alreadyReceivingData = false;
 
-        public enum Material { WindowsStartupSound, Wood, Snow };
+        public enum Material { WindowsStartupSound, Wood, Snow };   // The material which should be simulated (concrete configurations of each material are set on the shoe, 
+                                                                    // change of the material ==> change of the soundclip (and i.e. for snow: no vibration when reducing the pressure again (snow is not elastic like wood))
 
-        private int strength = 0;
-        private Material material = Material.Wood;
-        private int volume = 0;
-        private int layers = 0;
+        private int strength = 0;                                   // how much pressure needs to be applied before the vibration starts ( 0-255 )
+        private Material material = Material.Wood;          
+        private int volume = 0;                                     // amplitude ( 0-127 )
+        private int layers = 0;                                     // amount of layers which are used to create compliance ( 2-16 , usually 15 is used)
 
-        
         public void Start()
         {
             Connect(IPAddress);
-
-            //ToggleDataTransfer();
-            //SendToShoe(100, Material.Wood, 70, 16);
-            //ReceiveData((a,b)=> { Debug.Log(a + " " + b); });
         }
 
         public void Connect(string ipAddress = null)
@@ -60,6 +62,16 @@ namespace HapticShoes
             shoeInstance?.Dispose();
         }
 
+        /// <summary>
+        /// This method needs to be called to send new values to the shoe
+        /// 
+        /// The sent values will be saved on the shoe device until new ones will be send.
+        /// Calling this method will not cause the shoe to vibrate, it only sets the values of the vibration played when applying enough pressure on the sensor.
+        /// </summary>
+        /// <param name="strength"> "Threshold" 0-255 </param> 
+        /// <param name="material"> The material which should be simulated (see above) </param> 
+        /// <param name="volume"> "Amplitude" 0-127 </param>   
+        /// <param name="layers"> 2-16 </param>   
         public void SendToShoe(int strength, Material material = Material.Wood, int volume = 127, int layers = 15)
         {
             if (ToggleMapAndSetup.UseStaticVibration)
@@ -117,6 +129,8 @@ namespace HapticShoes
             }
         }
 
+        // This method is used if you want to use the static vibration, which is only modfiable in the amplitude.
+        // The static vibration will not be adjusted to the pressure sensor. It is static and will be played as soon as pressure is detected.
         public void SendStaticToShoe(int volume)
         {
             //Meh
@@ -145,38 +159,52 @@ namespace HapticShoes
             }
         }
 
+        /// <summary>
+        /// This method is used to let the shoes vibrate manually.
+        /// The duration of the vibration is very short, so this method is used to be called in an update function like OnCollisionStay.
+        /// </summary>
+        /// <param name="volum"> volume/amplitude </param> 
         public void SendVibrationToShoe(int volum = 127)
         {
             int clamppedVolume = Mathf.Clamp(volum, 0, 127);
 
             if (shoeInstance != null && shoeInstance.IsConnected)
             {
-                shoeInstance.SendMessage("8,"+ clamppedVolume .ToString()+ ",0\n");
+                shoeInstance.SendMessage("8," + clamppedVolume.ToString() + ",0\n");
             }
 
         }
 
+        /// <summary>
+        /// This method is used to let the shoes vibrate very strong for ~1s.
+        /// </summary>
         public void SendExplodeToShoe()
         {
-                
-                if (shoeInstance != null && shoeInstance.IsConnected)
-                {
-                    shoeInstance.SendMessage("7,0\n");
-                }
-            
+
+            if (shoeInstance != null && shoeInstance.IsConnected)
+            {
+                shoeInstance.SendMessage("7,0\n");
+            }
+
         }
 
-        public void CalibrateMax()
+        /// <summary>
+        /// Intializes the calibration of the weight of the user.
+        /// </summary>
+        /// <returns> false if the shoe is not connected yet </returns>
+        public bool CalibrateMax()
         {
             if (shoeInstance != null && shoeInstance.IsConnected)
             {
                 shoeInstance.SendMessage("1,0,\n");
+                return true;
             }
+            else return false;
         }
 
         public void CalibrateMin()
         {
-            //brauchen wir aktuell nicht mehr
+            //Not needed anymore
             return;
             if (shoeInstance != null && shoeInstance.IsConnected)
             {
@@ -195,13 +223,10 @@ namespace HapticShoes
         public void ReceiveData(Action<int, int> action)
         {
             callback += action;
-            //print("1");
             if (shoeInstance != null && shoeInstance.IsConnected)
             {
-                //print("2");
                 if (!alreadyReceivingData)
                 {
-                    //print("3");
                     alreadyReceivingData = true;
                     ToggleDataTransfer();
                     shoeInstance.ServerResponse += ProcessData;
@@ -212,17 +237,14 @@ namespace HapticShoes
 
         private void ProcessData(object sender, EventArgs e)
         {
-            
             Dispatcher.RunOnMainThread(() =>
-            {                
+            {
                 var shoeMessage = sender.ToString();
-                
-                //Debug.Log(shoeMessage);
+
                 var s = shoeMessage.Split(';');
 
                 var currentPressureLevel = int.Parse(s[1]);
                 var adjustedPressureLevel = int.Parse(s[2]);
-
 
                 callback.Invoke(currentPressureLevel, adjustedPressureLevel);
             });
@@ -233,6 +255,5 @@ namespace HapticShoes
             Debug.Log("Removing Shoe");
             shoeInstance?.Dispose();
         }
-
     }
 }
