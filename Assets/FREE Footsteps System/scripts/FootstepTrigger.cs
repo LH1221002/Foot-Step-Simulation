@@ -88,26 +88,19 @@ namespace Footsteps
         private bool aboveBomb;
         private void Update()
         {
-            if (useShoeDeviceDate)
+            if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
             {
-                if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider"))))
-                {
-                    //offsetDistance = hit.distance;
-                    //Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
-                    VibrationData vd = updatePosition(hit);
-                    if (vd == null) return;
-                    if (sc) sc.SendToShoe(vd.Strength, vd.Material, vd.Volume, vd.Layers);
-                    aboveBomb = vd.Strength == 0;
-                }
-                else
-                {
-                    if (sc) sc.SendToShoe(255);
-                    aboveBomb = false;
-                }
-
+                //offsetDistance = hit.distance;
+                //Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
+                VibrationData vd = updatePosition(hit);
+                if (vd == null) return;
+                print("Hi: " + vd.Material.ToString());
+                if (sc) sc.SendToShoe(vd.Strength, vd.Material, vd.Volume, vd.Layers);
+                aboveBomb = vd.Strength == 0;
             }
             else
             {
+                if (sc) sc.SendToShoe(255);
                 aboveBomb = false;
             }
         }
@@ -142,7 +135,7 @@ namespace Footsteps
                     //GameObject.FindGameObjectWithTag("TestCube").GetComponent<Rigidbody>().AddExplosionForce(600, new Vector2(hit.collider.transform.position.x, hit.collider.transform.position.z), 4, 6);
                 }
                 //print(hit.collider.name + ": "+hit.collider.transform.localPosition);
-                if(hit.collider.gameObject.TryGetComponent<StandingButton>(out StandingButton sb))
+                if (hit.collider.gameObject.TryGetComponent<StandingButton>(out StandingButton sb))
                 {
                     currentStandingButton = sb;
                     sb.Enter(this.iAmLeft);
