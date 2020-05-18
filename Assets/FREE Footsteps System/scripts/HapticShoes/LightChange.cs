@@ -32,14 +32,14 @@ public class LightChange : MonoBehaviour
 
         RotateShoe();                                       //Rotates the 3D Shoe object in unity, so the controllers or trackers do not need to be at the exact same position every time (which would be practically impossible)
 
-        while (!shoeController.CalibrateMax())
+        while (shoeController!=null && !shoeController.CalibrateMax())
         {
             yield return new WaitForSeconds(1);
         }
 
         lightIndicator.color = Color.blue;                  //Indicator that the calibration is done
 
-        shoeController.ReceiveData(ChangeLight);            //Submits a method to be called with the pressure data in an update function
+        if (shoeController) shoeController.ReceiveData(ChangeLight);            //Submits a method to be called with the pressure data in an update function
     }
 
     private void RotateShoe()
