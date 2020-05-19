@@ -37,13 +37,14 @@ public class LightChange1 : MonoBehaviour
             var forwarsd = -hit.transform.gameObject.transform.up * 10;
             var e = Quaternion.LookRotation(-hit.transform.up).eulerAngles;
             shoe.transform.rotation = Quaternion.FromToRotation(-Vector3.up, hit.normal);
+            //shoe.transform.localRotation = Quaternion.Euler(shoe.transform.localRotation.eulerAngles.x+90, shoe.transform.localRotation.eulerAngles.y, shoe.transform.localRotation.eulerAngles.z);
             Debug.DrawRay(hit.transform.gameObject.transform.position, hit.normal * 10, Color.green, 25);
 
             //Debug.Log(LookAtTarget.transform.rotation.eulerAngles.y);
 
 
             cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x, cont.transform.position.y, LookAtTarget.transform.position.z));
-            cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + 90, 0);
+            cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y, 0);
 
         }
         else
@@ -59,6 +60,7 @@ public class LightChange1 : MonoBehaviour
 
 
         shoeController.ReceiveData(ChangeLight);
+        lightIndicator.enabled = false;
     }
 
 

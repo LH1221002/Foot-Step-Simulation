@@ -14,6 +14,7 @@ public class LightChange : MonoBehaviour
     public GameObject shoe;
     public GameObject LookAtTarget;
     public GameObject cont;
+    public bool isLeft;
 
 
     private ShoeController shoeController;
@@ -40,6 +41,8 @@ public class LightChange : MonoBehaviour
         lightIndicator.color = Color.blue;                  //Indicator that the calibration is done
 
         if (shoeController) shoeController.ReceiveData(ChangeLight);            //Submits a method to be called with the pressure data in an update function
+
+        lightIndicator.enabled = false;
     }
 
     private void RotateShoe()
@@ -55,7 +58,7 @@ public class LightChange : MonoBehaviour
             Debug.DrawRay(hit.transform.gameObject.transform.position, hit.normal * 10, Color.green, 25);
 
             cont.transform.LookAt(new Vector3(LookAtTarget.transform.position.x, cont.transform.position.y, LookAtTarget.transform.position.z));
-            cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + 90, 0);
+            cont.transform.localRotation = Quaternion.Euler(0, cont.transform.localRotation.eulerAngles.y + (isLeft ? 45 : 135), 0);
 
         }
         else

@@ -94,7 +94,7 @@ namespace Footsteps
                 //Debug.DrawLine(transform.position, hit.point, Color.cyan, 2, false);
                 VibrationData vd = updatePosition(hit);
                 if (vd == null) return;
-                print("Hi: " + vd.Material.ToString());
+                //print("Hi: " + vd.Material.ToString());
                 if (sc) sc.SendToShoe(vd.Strength, vd.Material, vd.Volume, vd.Layers);
                 aboveBomb = vd.Strength == 0;
             }
@@ -119,6 +119,7 @@ namespace Footsteps
             if (useShoeDeviceDate) return;
 
             handlePressure(0.6f);
+            //print("play");
         }
 
         private StandingButton currentStandingButton;
@@ -127,6 +128,7 @@ namespace Footsteps
             //print("Pressure: " + pressure);
             if (Physics.Raycast(this.transform.position + new Vector3(0, 1, 0), -Vector3.up, out RaycastHit hit, Mathf.Infinity, ~(1 << LayerMask.NameToLayer("ShoeCollider")))) // ignore collisions with layerX))
             {
+                //print("oh oh " + footsteps);
                 if (footsteps)
                 {
                     if (sc && aboveBomb) sc.SendExplodeToShoe();
