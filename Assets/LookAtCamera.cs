@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class LookAtCamera : MonoBehaviour
 {
-    public Camera currentCamera;
+    private Camera currentCamera;
+
+    private void Start()
+    {
+        currentCamera = Camera.main;
+    }
     void Update()
     {
         this.transform.LookAt(new Vector3(currentCamera.transform.position.x, transform.position.y, currentCamera.transform.position.z));
