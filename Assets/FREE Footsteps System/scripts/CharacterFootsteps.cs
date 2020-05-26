@@ -376,6 +376,7 @@ namespace Footsteps
 
             if (currenti >= goals.Length) return;
             //print(coordinates +" : "+ goals[currenti]);
+            //print(Vector2.Distance(coordinates, goals[currenti]));
             if (Vector2.Distance(coordinates, goals[currenti]) <0.6f)
             {
                 //Show progress or smth
